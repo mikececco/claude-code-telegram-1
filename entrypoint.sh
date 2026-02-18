@@ -45,9 +45,12 @@ if [ -n "$GIT_REPOS" ]; then
             if [ -n "$branch" ]; then
                 clone_args+=(--branch "$branch")
             fi
-            git clone "${clone_args[@]}" "$url" "$target_dir"
-            commit=$(git -C "$target_dir" rev-parse --short HEAD)
-            echo "  -> ${repo_name} ready (${commit})"
+            if git clone "${clone_args[@]}" "$url" "$target_dir"; then
+                commit=$(git -C "$target_dir" rev-parse --short HEAD)
+                echo "  -> ${repo_name} ready (${commit})"
+            else
+                echo "  !! Failed to clone ${repo_name} (check GITHUB_TOKEN permissions)"
+            fi
         fi
     done
 else
