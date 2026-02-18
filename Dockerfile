@@ -19,7 +19,12 @@ COPY . .
 # Create directories for SQLite DB and project files
 RUN mkdir -p /app/data /app/projects
 
+# Add entrypoint script for repo cloning at startup
+COPY entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
+
 ENV APPROVED_DIRECTORY=/app/projects
 ENV USE_SDK=true
 
+ENTRYPOINT ["/app/entrypoint.sh"]
 CMD ["python", "-m", "src.main"]
