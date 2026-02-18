@@ -356,6 +356,17 @@ class ClaudeSDKManager:
                         # Continue processing even if callback fails
 
         except Exception as e:
+            # Workaround for claude-agent-sdk MessageParseError on unknown
+            # message types like rate_limit_event (SDK issue #583).
+            # If we already collected messages, treat as successful.
+            if "Unknown message type" in str(e) and messages:
+                logger.warning(
+                    "Ignoring unknown message type from CLI (SDK issue #583)",
+                    error=str(e),
+                    collected_messages=len(messages),
+                )
+                return
+
             # Handle both ExceptionGroups and regular exceptions
             if type(e).__name__ == "ExceptionGroup" or hasattr(e, "exceptions"):
                 logger.error(
